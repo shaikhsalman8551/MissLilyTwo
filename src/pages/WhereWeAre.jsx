@@ -324,41 +324,7 @@ const WhereWeAre = () => {
                 </div>
               )}
 
-              {/* Address List (always visible in map view too) */}
-              <div className="p-4 border-t">
-                <h3 className="font-semibold text-gray-800 mb-3">Our Locations</h3>
-                <div className="space-y-3">
-                  {contacts.addresses.map((address, index) => (
-                    <div
-                      key={address.id}
-                      onClick={() => handleAddressClick(address)}
-                      className={`p-3 rounded-lg cursor-pointer transition-all ${
-                        selectedAddress?.id === address.id
-                          ? 'bg-pink-50 border-pink-300'
-                          : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                      } border`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0">
-                          <FaMapMarkerAlt className="text-pink-600 mt-1" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800">{address.street}</p>
-                          <p className="text-sm text-gray-600">
-                            {address.city}, {address.state} {address.zipCode}
-                          </p>
-                          <p className="text-sm text-gray-600">{address.country}</p>
-                          {address.type && (
-                            <span className="inline-block mt-1 px-2 py-1 text-xs bg-pink-100 text-pink-600 rounded-full">
-                              {address.type}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+       
             </div>
           </div>
 

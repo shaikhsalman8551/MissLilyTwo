@@ -23,9 +23,9 @@ const Header = () => {
           <nav className="hidden md:flex space-x-8 gap-2">
             <Link to="/" className="hover:text-pink-100 transition transform hover:scale-105">Home</Link>
             <Link to="/products" className="hover:text-pink-100 transition transform hover:scale-105">Products</Link>
-            <Link to="/contact" className="hover:text-pink-100 transition transform hover:scale-105">Contact Us</Link>
             <Link to="/where-we-are" className="hover:text-pink-100 transition transform hover:scale-105">Where We Are</Link>
             <Link to="/showcase" className="hover:text-pink-100 transition transform hover:scale-105">Social</Link>
+            <Link to="/contact" className="hover:text-pink-100 transition transform hover:scale-105">Contact Us</Link>
           </nav>
 
           {/* Mobile menu button */}
@@ -45,9 +45,9 @@ const Header = () => {
           <nav id="mobile-menu" className="md:hidden pb-4 space-y-2 pt-2 animate-slide-in">
             <Link to="/" className="block hover:text-pink-100 transition transform hover:translate-x-2">Home</Link>
             <Link to="/products" className="block hover:text-pink-100 transition transform hover:translate-x-2">Products</Link>
-            <Link to="/contact" className="block hover:text-pink-100 transition transform hover:translate-x-2">Contact Us</Link>
             <Link to="/where-we-are" className="block hover:text-pink-100 transition transform hover:translate-x-2">Where We Are</Link>
             <Link to="/showcase" className="block hover:text-pink-100 transition transform hover:translate-x-2">Social</Link>
+            <Link to="/contact" className="block hover:text-pink-100 transition transform hover:translate-x-2">Contact Us</Link>
           </nav>
         )}
       </div>
