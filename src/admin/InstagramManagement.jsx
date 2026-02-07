@@ -15,10 +15,8 @@ const InstagramManagement = () => {
   useEffect(() => {
     const fetchInstagramConfig = async () => {
       try {
-        console.log('Admin: Fetching Instagram config...');
         const existingConfig = await getInstagramConfig();
         if (existingConfig) {
-          console.log('Admin: Instagram config loaded:', existingConfig);
           setInstagramConfig(existingConfig);
         } else {
           console.log('Admin: No Instagram config found, using default');
@@ -40,10 +38,8 @@ const InstagramManagement = () => {
     setErrorMessage('');
 
     try {
-      console.log('Admin: Saving Instagram config to Firebase:', instagramConfig);
       // Save to Firebase
       await saveInstagramConfig(instagramConfig);
-      console.log('Admin: Instagram config saved successfully');
       setSuccessMessage('Instagram configuration saved successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {

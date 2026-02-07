@@ -16,7 +16,7 @@ const Header = () => {
               alt="Miss Lily 2 Logo" 
               className="h-8 w-auto transform transition-transform group-hover:scale-105"
             /> */}
-            <div className="text-2xl font-bold transform transition-transform group-hover:scale-105">Miss Lily 2</div>
+            <div className="text-2xl font-bold transform transition-transform group-hover:scale-105">2</div>
           </Link>
 
           {/* Desktop Menu */}
@@ -47,8 +47,8 @@ const Header = () => {
             <Link to="/products" className="block hover:text-pink-100 transition transform hover:translate-x-2">Products</Link>
             <Link to="/contact" className="block hover:text-pink-100 transition transform hover:translate-x-2">Contact Us</Link>
             <Link to="/where-we-are" className="block hover:text-pink-100 transition transform hover:translate-x-2">Where We Are</Link>
-            <Link to="/showcase" className="block hover:text-pink-100 transition transform hover:translate-x-2">Showcase</Link>
-            <Link to="/admin-login" className="block hover:text-pink-100 font-semibold transition transform hover:translate-x-2">Admin</Link>
+            <Link to="/showcase" className="block hover:text-pink-100 transition transform hover:translate-x-2">Social</Link>
+            <Link to="/admin-login" className="block hover:text-pink-100 font-semibold transition transform hover:translate-x-2">Admin Login</Link>
           </nav>
         )}
       </div>
