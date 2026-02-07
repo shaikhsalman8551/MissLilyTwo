@@ -1,0 +1,51 @@
+# Node modules
+node_modules/
+
+# Build output (Vite)
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Cache
+.cache/
+.eslintcache
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+
+# Coverage
+coverage/
+
+# Vercel
+.vercel/

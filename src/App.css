@@ -1,0 +1,18 @@
+/* Legacy container class - renamed to avoid conflicts with Tailwind */
+
+.container-legacy {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.container-legacy h1 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.container-legacy p {
+    color: #666;
+    font-size: 1.1rem;
+}
