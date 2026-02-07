@@ -402,7 +402,7 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <FaComments className="text-yellow-600" />
+                    <FaComments className="text-pink-600" />
                     Recent Inquiries
                   </h3>
                   <button
@@ -442,7 +442,7 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <FaEnvelope className="text-green-600" />
+                    <FaEnvelope className="text-pink-600" />
                     Recent Messages
                   </h3>
                   <button

@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
           <div className="text-center md:text-left">
             <h3 className="text-lg font-bold mb-6 flex items-center gap-2 justify-center md:justify-start">
-              <FaTshirt /> MissLily2
+              <FaTshirt /> Miss Lily 2
             </h3>
             <p className="text-gray-400 leading-relaxed">
               Premium ladies wear collection for modern women who value style, comfort, and elegance.
@@ -40,7 +40,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; 2026 MissLily2. All rights reserved. | Premium Ladies Wear</p>
+          <p>&copy; 2026 Miss Lily 2. All rights reserved. | Premium Ladies Wear</p>
         </div>
       </div>
     </footer>

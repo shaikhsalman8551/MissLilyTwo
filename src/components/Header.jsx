@@ -16,7 +16,7 @@ const Header = () => {
               alt="Miss Lily 2 Logo" 
               className="h-8 w-auto transform transition-transform group-hover:scale-105"
             /> */}
-            <div className="text-2xl font-bold transform transition-transform group-hover:scale-105">Miss Lily</div>
+            <div className="text-2xl font-bold transform transition-transform group-hover:scale-105">Miss Lily 2</div>
           </Link>
 
           {/* Desktop Menu */}
@@ -24,7 +24,7 @@ const Header = () => {
             <Link to="/" className="hover:text-pink-100 transition transform hover:scale-105">Home</Link>
             <Link to="/products" className="hover:text-pink-100 transition transform hover:scale-105">Products</Link>
             <Link to="/where-we-are" className="hover:text-pink-100 transition transform hover:scale-105">Where We Are</Link>
-            <Link to="/showcase" className="hover:text-pink-100 transition transform hover:scale-105">Social</Link>
+            <Link to="/showcase" className="hover:text-pink-100 transition transform hover:scale-105">Social Media</Link>
             <Link to="/contact" className="hover:text-pink-100 transition transform hover:scale-105">Contact Us</Link>
           </nav>
 
@@ -46,7 +46,7 @@ const Header = () => {
             <Link to="/" className="block hover:text-pink-100 transition transform hover:translate-x-2">Home</Link>
             <Link to="/products" className="block hover:text-pink-100 transition transform hover:translate-x-2">Products</Link>
             <Link to="/where-we-are" className="block hover:text-pink-100 transition transform hover:translate-x-2">Where We Are</Link>
-            <Link to="/showcase" className="block hover:text-pink-100 transition transform hover:translate-x-2">Social</Link>
+            <Link to="/showcase" className="block hover:text-pink-100 transition transform hover:translate-x-2">Social Media</Link>
             <Link to="/contact" className="block hover:text-pink-100 transition transform hover:translate-x-2">Contact Us</Link>
           </nav>
         )}

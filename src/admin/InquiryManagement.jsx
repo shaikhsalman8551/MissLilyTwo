@@ -62,7 +62,6 @@ const InquiryManagement = () => {
         inq.id === inquiryId ? { ...inq, status: newStatus } : inq
       ));
       
-      console.log('Inquiry status updated:', inquiryId, newStatus);
     } catch (error) {
       console.error('Error updating inquiry status:', error);
       alert('Error updating inquiry status');

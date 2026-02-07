@@ -27,6 +27,24 @@ const ProductCard = ({ product }) => {
               -{discountPercent}%
             </div>
           )}
+          {/* Stock Status Badge */}
+          {product.stock !== undefined && (
+            <div className="absolute top-3 left-3">
+              {product.stock < 0 ? (
+                <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                  Out of Stock
+                </div>
+              ) : product.stock > 0 && product.stock < 10 ? (
+                <div className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg animate-pulse-slow">
+                  Only {product.stock} left
+                </div>
+              ) : product.stock >= 10 ? (
+                <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                  In Stock
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
 
         {/* Thumbnail images */}
@@ -55,6 +73,11 @@ const ProductCard = ({ product }) => {
             {discountPercent > 0 && (
               <span className="text-lg text-gray-400 line-through">₹{originalPrice.toFixed(2)}</span>
             )}
+          {product?.code && (
+           <p  className="text-2xl sm:text-3xl font-bold bg-pink-100 text-pink-600 rounded-full px-4">
+             {product.code}
+           </p>
+         )}
           </div>
 
           {/* Category Badge */}
@@ -63,6 +86,7 @@ const ProductCard = ({ product }) => {
               {product.category}
             </p>
           )}
+
 
           {/* Action Buttons */}
           <div className="flex gap-3">

@@ -13,12 +13,9 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('Fetching data for home page...');
         const products = await getAllProducts();
-        console.log('Products fetched:', products);
         setFeaturedProducts(products.slice(0, 6));
         const cats = await getAllCategories();
-        console.log('Categories fetched:', cats);
         setCategories(cats.filter(cat => cat.isActive !== false));
       } catch (error) {
         console.error('Error fetching data:', error);

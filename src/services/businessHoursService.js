@@ -1,6 +1,7 @@
 import { collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
+
 const BUSINESS_HOURS_COLLECTION = 'businessHours';
 
 // Get all business hours

@@ -8,10 +8,10 @@ export const getWebsiteContacts = async() => {
         const settings = await getContactSettings();
 
         return {
-            phones: settings.phones ? settings.phones.filter(phone => phone.isActive) : [],
-            whatsapp: settings.whatsapp ? settings.whatsapp.filter(wa => wa.isActive) : [],
-            emails: settings.emails ? settings.emails.filter(email => email.isActive) : [],
-            addresses: settings.addresses ? settings.addresses.filter(addr => addr.isActive) : []
+            phones: settings.phones.filter(phone => phone.isActive) || [],
+            whatsapp: settings.whatsapp.filter(wa => wa.isActive) || [],
+            emails: settings.emails.filter(email => email.isActive) || [],
+            addresses: settings.addresses.filter(addr => addr.isActive) || []
         };
     } catch (error) {
         console.error('Error fetching website contacts:', error);
@@ -22,12 +22,12 @@ export const getWebsiteContacts = async() => {
             emails: [{ id: 'fallback-email-1', email: 'info@misslily.com', type: 'info', isActive: true }],
             addresses: [{
                 id: 'fallback-addr-1',
-                street: '123 Fashion Street',
-                city: 'Style City',
-                state: 'SC',
-                zipCode: '12345',
+                street: 'Miss lily, suthar faliyu',
+                city: 'ankleshwar',
+                state: 'Gujarat',
+                zipCode: '33001',
                 country: 'India',
-                type: 'main',
+                type: 'branch',
                 isActive: true
             }]
         };

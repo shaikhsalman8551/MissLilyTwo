@@ -431,7 +431,7 @@ const WhereWeAre = () => {
               {contacts.whatsapp.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <FaWhatsapp className="text-green-600" />
+                    <FaWhatsapp className="font-semibold text-pink-600 " />
                     <h4 className="font-semibold text-gray-800">WhatsApp</h4>
                   </div>
                   <div className="space-y-2">
@@ -455,7 +455,7 @@ const WhereWeAre = () => {
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <div className="flex items-center gap-2 mb-2">
                   <FaClock className="text-pink-600" />
-                  <h4 className="font-semibold text-gray-800">Business Hours</h4>
+                  <h4 className="font-semibold text-pink-800">Business Hours</h4>
                 </div>
                 <div className="text-sm text-gray-600">
                   {businessHours ? (
@@ -468,6 +468,12 @@ const WhereWeAre = () => {
                           {businessHours.specialInstructions}
                         </p>
                       )}
+                   {businessHours?.holidays?.mapValue?.fields?.note?.stringValue && (
+  <p className="mt-2 text-xs text-pink-600 italic">
+    {businessHours.holidays.mapValue.fields.note.stringValue}
+  </p>
+)}
+
                     </div>
                   ) : (
                     <div className="space-y-1">

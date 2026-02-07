@@ -433,7 +433,7 @@ const ContactSettings = () => {
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Section Tabs */}
-                <div className="bg-white rounded-xl shadow-lg p-2 mb-6 inline-flex border border-pink-100">
+                <div className="bg-white rounded-xl shadow-lg p-2 mb-6 flex flex-wrap border border-pink-100">
                     {[
                         { id: 'phones', label: 'Phone Numbers', icon: FaPhone },
                         { id: 'whatsapp', label: 'WhatsApp', icon: FaWhatsapp },
@@ -470,7 +470,7 @@ const ContactSettings = () => {
                 {showForm && renderForm()}
 
                 {/* List */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-pink-100">
+                <div className="bg-white rounded-xl shadow-lg p-6 border border-pink-100 ">
                     <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                         {activeSection === 'phones' && <FaPhone className="text-pink-600" />}
                         {activeSection === 'whatsapp' && <FaWhatsapp className="text-green-600" />}

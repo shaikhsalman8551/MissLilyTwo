@@ -26,21 +26,13 @@ const firebaseConfig = {
 };
 
 if (!firebaseConfig.projectId || !firebaseConfig.apiKey) {
-    // Lightweight runtime hint for developer — not a substitute for proper error handling.
-    // Ensure you create a `.env.local` (or set system env vars) with the VITE_FIREBASE_* values.
-    console.error('Firebase configuration is missing!');
-    console.error('Project ID:', firebaseConfig.projectId);
-    console.error('API Key:', firebaseConfig.apiKey ? 'Present' : 'Missing');
-    console.error('Auth Domain:', firebaseConfig.authDomain);
+
     throw new Error('Firebase configuration is missing. Please check your .env.local file.');
 }
 
 const app = initializeApp(firebaseConfig);
 // Helpful debug log to confirm which Firebase project the client is using
-if (typeof window !== 'undefined') {
-    // prints in browser console
-    console.info('Firebase projectId:', firebaseConfig.projectId || '(empty)');
-}
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);

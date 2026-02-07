@@ -13,6 +13,8 @@ const ProductDetails = () => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });
+    const [showMagnifier, setShowMagnifier] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -94,6 +96,23 @@ const ProductDetails = () => {
         navigate('/contact');
     };
 
+    const handleMouseMove = (e) => {
+        const img = e.target;
+        const rect = img.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        setMagnifierPosition({ x, y, rect });
+    };
+
+    const handleMouseEnter = () => {
+        setShowMagnifier(true);
+    };
+
+    const handleMouseLeave = () => {
+        setShowMagnifier(false);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +134,29 @@ const ProductDetails = () => {
                                 alt={product.name}
                                 className="w-full h-auto max-h-[600px] object-cover rounded-lg cursor-pointer hover:opacity-90 transition"
                                 onClick={() => openLightbox(selectedImageIndex)}
+                                onMouseMove={handleMouseMove}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
                             />
+                            
+                            {/* Magnifying Glass */}
+                            {showMagnifier && magnifierPosition.rect && (
+                                <div
+                                    className="absolute pointer-events-none border-2 border-pink-500 rounded-full shadow-lg overflow-hidden"
+                                    style={{
+                                        width: '120px',
+                                        height: '120px',
+                                        left: `${Math.min(Math.max(magnifierPosition.x - 60, 0), magnifierPosition.rect.width - 120)}px`,
+                                        top: `${Math.min(Math.max(magnifierPosition.y - 60, 0), magnifierPosition.rect.height - 120)}px`,
+                                        backgroundImage: `url(${mainImage})`,
+                                        backgroundPosition: `-${magnifierPosition.x * 2 - 60}px -${magnifierPosition.y * 2 - 60}px`,
+                                        backgroundSize: `${magnifierPosition.rect.width * 2}px ${magnifierPosition.rect.height * 2}px`,
+                                        backgroundRepeat: 'no-repeat',
+                                        zIndex: 10
+                                    }}
+                                />
+                            )}
+                            
                             {product.images && product.images.length > 1 && (
                                 <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
                                     {selectedImageIndex + 1} / {product.images.length}
@@ -139,27 +180,53 @@ const ProductDetails = () => {
                                     ₹{(parseFloat(product.price) || 0).toFixed(2)}
                                 </span>
                             )}
+                         
                         </div>
 
                         {/* Category */}
-                        {product.categoryId && (
+                        {product.category && (
                             <div className="mb-4">
                                 <span className="text-sm text-gray-500">Category:</span>
-                                <span className="ml-2 text-sm font-medium">{product.categoryId}</span>
+                                <span className="ml-2 text-sm font-medium">{product.category}</span>
                             </div>
                         )}
+                    
+                                 {product?.code && (
+                                    <>
+                                    <div className='flex items-center'>
 
+                                     CODE:
+           <p  className="text-2xl sm:text-3xl font-bold text-pink-600 rounded-full px-4">
+             {product.code}
+           </p>
+                                    </div>
+                                    </>
+         )}
                         {/* Stock Status */}
                         <div className="mb-4">
-                            <span className={`inline-block px-3 py-1 text-xs rounded-full ${
-                                product.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            <span className={`inline-block px-3 py-1 text-xs rounded-full font-semibold ${
+                                product.stock < 0 
+                                    ? 'bg-red-100 text-red-700' 
+                                    : product.stock > 0 && product.stock < 10 
+                                        ? 'bg-orange-100 text-orange-700 animate-pulse-slow'
+                                        : product.stock >= 10 
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-700'
                             }`}>
-                                {product.isActive ? 'In Stock' : 'Out of Stock'}
+                                {product.stock < 0 
+                                    ? 'Out of Stock' 
+                                    : product.stock > 0 && product.stock < 10 
+                                        ? `Only ${product.stock} left in stock!`
+                                        : product.stock >= 10 
+                                            ? `In Stock (${product.stock} available)`
+                                            : 'Stock Status Unknown'
+                                }
                             </span>
                         </div>
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3">
+                            
                             {/* <button
                                 onClick={handleRequestInfo}
                                 className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-rose-600 transition"

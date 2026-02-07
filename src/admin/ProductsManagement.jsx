@@ -16,6 +16,7 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   price: Yup.number().required('Price is required').positive(),
   categoryId: Yup.string().required('Category is required'),
+  code: Yup.string().required('Cpde is required'),
   discount: Yup.number().min(0).max(100),
   stock: Yup.number().required('Stock is required'),
   isActive: Yup.boolean()
@@ -34,6 +35,7 @@ const ProductsManagement = () => {
     description: '',
     price: '',
     categoryId: '',
+    code:"",
     discount: 0,
     stock: '',
     isActive: true
@@ -69,6 +71,7 @@ const ProductsManagement = () => {
       price: product.price || '',
       categoryId: product.categoryId || '',
       discount: product.discount || 0,
+      code: product.code || 0,
       stock: product.stock || '',
       isActive: product.isActive !== false,
       images: product.images || []
@@ -86,6 +89,7 @@ const ProductsManagement = () => {
       price: '',
       categoryId: '',
       discount: 0,
+      code:"",
       stock: '',
       isActive: true
     });
@@ -131,6 +135,7 @@ const ProductsManagement = () => {
         categoryId: '',
         discount: 0,
         stock: '',
+        code:"",
         isActive: true,
         images: []
       });
@@ -200,6 +205,7 @@ const ProductsManagement = () => {
                 categoryId: '',
                 discount: 0,
                 stock: '',
+                code:"",
                 isActive: true
               });
               setImageFiles([]);
@@ -267,6 +273,18 @@ const ProductsManagement = () => {
                         placeholder="1999"
                       />
                       <ErrorMessage name="price" component="p" className="text-red-500 text-sm mt-1" />
+                    </div>
+                      <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Code
+                      </label>
+                      <Field
+                        name="code"
+                        type="text"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        placeholder="like FTK, etc"
+                      />
+                      <ErrorMessage name="code" component="p" className="text-red-500 text-sm mt-1" />
                     </div>
 
                     <div>
@@ -416,6 +434,7 @@ const ProductsManagement = () => {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Discount</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Stock</th>
+                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Code</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
@@ -433,6 +452,7 @@ const ProductsManagement = () => {
                       <td className="px-6 py-4 text-sm text-gray-800">₹{product.price}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{product.discount || 0}%</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{product.stock}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{product.code || "-"}</td>
                       <td className="px-6 py-4 text-sm">
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${product.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {product.isActive !== false ? 'Active' : 'Inactive'}
