@@ -9,15 +9,11 @@ const Showcase = () => {
   useEffect(() => {
     const fetchInstagramConfig = async () => {
       try {
-        console.log('Showcase: Fetching Instagram config...');
         const config = await getInstagramConfig();
         if (config) {
-          console.log('Showcase: Instagram config loaded:', config);
           setInstagramConfig(config);
         } else {
-          console.log('Showcase: No Instagram config found, initializing default...');
           const defaultConfig = await initializeInstagramConfig();
-          console.log('Showcase: Default Instagram config initialized:', defaultConfig);
           setInstagramConfig(defaultConfig);
         }
       } catch (error) {

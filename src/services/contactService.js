@@ -46,7 +46,6 @@ export const saveContactInquiry = async(inquiryData) => {
         };
 
         const docRef = await addDoc(inquiryRef, inquiry);
-        console.log('Contact inquiry saved with ID:', docRef.id);
         return { id: docRef.id, ...inquiry };
     } catch (error) {
         console.error('Error saving contact inquiry:', error);

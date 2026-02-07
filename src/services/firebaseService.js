@@ -27,8 +27,7 @@ import { compressImage, validateImageFile } from '../utils/imageUtils';
 // ============ PRODUCTS ============
 export const addProduct = async(productData, imageFiles) => {
     try {
-        console.log('Adding product:', productData);
-        console.log('Image files:', imageFiles);
+
 
         const imageUrls = [];
 
@@ -36,7 +35,6 @@ export const addProduct = async(productData, imageFiles) => {
         if (imageFiles && imageFiles.length > 0) {
             for (let i = 0; i < imageFiles.length; i++) {
                 const file = imageFiles[i];
-                console.log(`Processing image:`, file.name);
 
                 // Validate file
                 const validation = validateImageFile(file, 5);
@@ -65,7 +63,7 @@ export const addProduct = async(productData, imageFiles) => {
         };
 
         const docRef = await addDoc(collection(db, 'products'), productDoc);
-        console.log('Product saved with ID:', docRef.id);
+
 
         return docRef.id;
     } catch (error) {
@@ -104,10 +102,7 @@ export const getProductById = async(id) => {
 
 export const updateProduct = async(id, productData, newImageFiles = [], existingImages = []) => {
     try {
-        console.log('Updating product with ID:', id);
-        console.log('Product data:', productData);
-        console.log('New image files:', newImageFiles);
-        console.log('Existing images:', existingImages);
+
 
         let imageUrls = [...existingImages];
 
@@ -115,7 +110,7 @@ export const updateProduct = async(id, productData, newImageFiles = [], existing
         if (newImageFiles && newImageFiles.length > 0) {
             for (let i = 0; i < newImageFiles.length; i++) {
                 const file = newImageFiles[i];
-                console.log(`Processing new image:`, file.name);
+                (`Processing new image:`, file.name);
 
                 // Validate file
                 const validation = validateImageFile(file, 5);
