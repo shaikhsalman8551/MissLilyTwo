@@ -4,9 +4,9 @@
     "version": "0.1.0",
     "type": "module",
     "scripts": {
-        "dev": "npx vite",
-        "build": "npx vite build",
-        "preview": "npx vite preview"
+        "dev": "npm vite",
+        "build": "npm vite build",
+        "preview": "npm vite preview"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.7",
