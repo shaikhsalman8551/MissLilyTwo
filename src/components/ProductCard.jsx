@@ -32,7 +32,7 @@ const ProductCard = ({ product }) => {
           className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg hover:bg-white transition-all transform hover:scale-110"
           title="Share on WhatsApp"
         >
-          <FaWhatsapp className="text-base text-green-600" />
+          <FaWhatsapp className="text-base text-green-600" /> 
         </button>
 
         {/* Image Section - Enhanced */}

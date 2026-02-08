@@ -246,7 +246,7 @@ const ProductDetails = () => {
                 className="bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold text-lg shadow-lg transition-transform hover:scale-105"
               >
                 <FaWhatsapp className="inline mr-2" />
-                WhatsApp
+                Share 
               </button>
 
               <button
