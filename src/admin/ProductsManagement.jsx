@@ -259,11 +259,11 @@ const ProductsManagement = () => {
   return (
     <AdminLayout title="Product Management">
 
-    <div className="min-h-screen bg-gray-100">
+    <div className=" bg-gray-100">
       {/* Admin Navbar */}
      
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+      <div className="  ">
         {/* Search and Add Product Button */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="flex-1">
@@ -515,9 +515,12 @@ const ProductsManagement = () => {
         )}
 
         {/* Products Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+   <div className="bg-white rounded-lg shadow-md overflow-hidden">
+  <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+   
+      <table className="w-full text-sm min-w-[900px]">
+
+
               <thead className="bg-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
@@ -586,6 +589,7 @@ const ProductsManagement = () => {
                 )}
               </tbody>
             </table>
+          
           </div>
         </div>
       </div>

@@ -126,7 +126,7 @@ const AdminDashboard = () => {
    
          
 
-        <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-12 max-w-full">
+        <div className=" pt-8 pb-12 max-w-full">
           {/* Removed redirect cards - now using sidebar */}
 
    
