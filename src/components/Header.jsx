@@ -5,6 +5,11 @@ import { FaTimes, FaBars } from 'react-icons/fa';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+
+  //if admin logged in then hide header
+  if (localStorage.getItem('adminLoggedIn')) {
+    return null;
+  }
   return (
     <header className="bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

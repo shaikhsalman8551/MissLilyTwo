@@ -1,6 +1,8 @@
 import React from 'react';
 import { FaTshirt } from 'react-icons/fa';
-
+if (localStorage.getItem('adminLoggedIn')) {
+    return null;
+  }
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white mt-20">
@@ -33,7 +35,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <h4 className="text-lg font-semibold mb-6">Follow Us</h4>
             <ul className="flex justify-center md:justify-start items-center gap-6 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors duration-200">Instagram</a></li>
+              <li><a href="/showcase" className="hover:text-white transition-colors duration-200">Instagram</a></li>
               <li><a href="#" className="hover:text-white transition-colors duration-200">Facebook</a></li>
     
             </ul>
