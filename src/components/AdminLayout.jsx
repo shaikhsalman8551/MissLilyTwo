@@ -14,7 +14,7 @@ const AdminLayout = ({ children, title, loading = false, loadingMessage = 'Loadi
     navigate('/admin-login');
   };
   return (
-    <div className="h-screen bg-gray-100 flex overflow-auto">
+    <div className="h-screen bg-gray-100 flex ">
       {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
@@ -55,7 +55,7 @@ const AdminLayout = ({ children, title, loading = false, loadingMessage = 'Loadi
         </div>
         
         {/* Page Content */}
-         <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 ">
+         <div className="flex-1  px-4 sm:px-2 lg:px-8 py-6 ">
           {loading ? (
             <AdminLoader message={loadingMessage} />
           ) : (

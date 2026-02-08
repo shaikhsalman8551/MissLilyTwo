@@ -259,7 +259,8 @@ const ProductsManagement = () => {
   return (
     <AdminLayout title="Product Management">
 
-    <div className=" bg-gray-100">
+ <div className="bg-gray-100 w-[100vw] lg:w-full">
+
       {/* Admin Navbar */}
      
 
@@ -515,11 +516,10 @@ const ProductsManagement = () => {
         )}
 
         {/* Products Table */}
-   <div className="bg-white rounded-lg shadow-md overflow-hidden">
-  <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-   
-      <table className="w-full text-sm min-w-[900px]">
+      <div className="bg-white rounded-lg shadow-md ">
+ <div className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
 
+    <table className="min-w-[900px] w-full text-sm">
 
               <thead className="bg-gray-200">
                 <tr>
@@ -589,7 +589,6 @@ const ProductsManagement = () => {
                 )}
               </tbody>
             </table>
-          
           </div>
         </div>
       </div>
