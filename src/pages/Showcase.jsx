@@ -94,52 +94,11 @@ const Showcase = () => {
               <strong>Note:</strong> This shows our latest Instagram content including reels and posts. 
               For the best reel experience, click the "Watch Our Reels" button above.
             </p>
-            {instagramConfig.reelIds && instagramConfig.reelIds.length > 0 && (
-              <p className="text-sm mt-2">
-                <strong>Configured Reels:</strong> {instagramConfig.reelIds.length} reel(s) available
-              </p>
-            )}
+          
           </div>
         </div>
 
-        {/* Configured Reels Section */}
-        {instagramConfig.reelIds && instagramConfig.reelIds.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Featured Instagram Reels</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {instagramConfig.reelIds.map((reelId, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="relative">
-                    <iframe
-                      src={`https://www.instagram.com/reel/${reelId}/embed`}
-                      className="w-full h-64"
-                      frameBorder="0"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      title={`Instagram Reel ${index + 1}`}
-                    />
-                    <div className="absolute top-3 right-3 bg-pink-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      Reel {index + 1}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-800 mb-2">Instagram Reel</h3>
-                    <p className="text-sm text-gray-600 mb-3">Check out our latest fashion content on Instagram</p>
-                    <a
-                      href={`https://www.instagram.com/reel/${reelId}/`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-pink-700 transition"
-                    >
-                      <FaInstagram className="mr-2" />
-                      View on Instagram
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+       
 
  
       </div>

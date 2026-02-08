@@ -10,7 +10,6 @@ import ContactUs from './pages/ContactUs';
 import WhereWeAre from './pages/WhereWeAre';
 import Showcase from './pages/Showcase';
 import ProductDetails from './ProductDetails.jsx';
-import InstagramReel from './components/InstagramReel';
 
 // Admin Pages
 import AdminLogin from './admin/AdminLogin';
@@ -44,8 +43,7 @@ function App() {
                     <Route path="/where-we-are" element={<WhereWeAre />} />
                     <Route path="/showcase" element={<Showcase />} />
                     <Route path="/product/:id" element={<ProductDetails />} />
-                    <Route path="/instagram" element={<InstagramReel />} />
-
+                 
                     {/* Admin Routes */}
                     <Route path="/admin/dashboard" element={<AdminDashboard />} />
                     <Route path="/admin/products" element={<ProductsManagement />} />

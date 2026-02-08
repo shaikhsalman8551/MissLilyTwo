@@ -98,6 +98,7 @@ const InstagramManagement = () => {
             >
               <FaArrowLeft className="text-gray-600" />
             </button>
+            <br />
             <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               <FaInstagram className="text-pink-600" />
               Instagram Management

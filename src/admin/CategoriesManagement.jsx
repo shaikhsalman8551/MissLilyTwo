@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { getAllCategories, addCategory, updateCategory, deleteCategory } from '../services/firebaseService';
-import { FaFolder, FaTimes, FaPlus, FaTshirt, FaUpload } from 'react-icons/fa';
+import {  FaTimes, FaPlus, FaTshirt, FaUpload } from 'react-icons/fa';
 import { showSuccess, showError, showConfirm, showLoading, closeLoading } from '../utils/notifications';
 
 const validationSchema = Yup.object().shape({
@@ -120,13 +120,13 @@ const CategoriesManagement = () => {
       <nav className="bg-gray-900 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <FaFolder /> Categories Management
+             Categories Management
           </h1>
           <button
             onClick={() => navigate('/admin/dashboard')}
             className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg"
           >
-            ← Back
+             Back
           </button>
         </div>
       </nav>
@@ -221,13 +221,13 @@ const CategoriesManagement = () => {
             <p>Loading...</p>
           ) : categories.length > 0 ? (
             categories.map(cat => {
-              console.log('Category data:', cat); // Debug log
+             
               return (
               <div key={cat.id} className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-center mb-3">
                   {cat.icon ? (
                     <img src={cat.icon} alt={cat.name} className="w-16 h-16 rounded-lg" onError={(e) => {
-                      console.log('Image failed to load:', cat.icon);
+                    
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }} />
