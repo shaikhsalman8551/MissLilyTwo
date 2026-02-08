@@ -25,6 +25,12 @@ import ContactSettings from './admin/ContactSettings';
 import ContactMessagesPage from './admin/ContactMessagesPage';
 
 function App() {
+  if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/service-worker.js");
+  });
+}
+
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
