@@ -32,6 +32,7 @@ import {
     FaUser,
     FaBuilding
 } from 'react-icons/fa';
+import AdminLayout from '../components/AdminLayout';
 
 const ContactSettings = () => {
     const navigate = useNavigate();
@@ -410,25 +411,13 @@ const ContactSettings = () => {
         );
     };
 
-    if (loading) {
-        return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
-    }
+
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-bold">Contact Settings</h1>
-                    </div>
-                    <button
-                        onClick={() => navigate('/admin/dashboard')}
-                        className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition backdrop-blur-sm"
-                    >
-                        Back to Dashboard
-                    </button>
-                </div>
-            </nav>
+        <AdminLayout title="Contact Settings">
+
+        <div className="min-h-screen bg-gray-100">
+          
 
             <div className="max-w-7xl mx-auto px-4 py-8">
                 {/* Section Tabs */}
@@ -477,7 +466,14 @@ const ContactSettings = () => {
                         {activeSection === 'addresses' && <FaMapMarkerAlt className="text-pink-600" />}
                         {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
                     </h2>
-                    
+                      {
+        loading ? (
+            <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading contact settings...</p>
+        </div>
+        ) : (
+                    <>
                     {renderList()}
                     
                     {settings[activeSection]?.length === 0 && (
@@ -492,9 +488,12 @@ const ContactSettings = () => {
                             <p className="text-gray-400 text-sm mt-2">Click the "Add" button to get started</p>
                         </div>
                     )}
+                </>
+                )}
                 </div>
             </div>
         </div>
+        </AdminLayout>
     );
 };
 

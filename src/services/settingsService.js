@@ -15,11 +15,11 @@ import {
 const SETTINGS_COLLECTION = 'settings';
 
 // ============ CONTACT SETTINGS ============
-export const getContactSettings = async () => {
+export const getContactSettings = async() => {
     try {
         const q = query(collection(db, SETTINGS_COLLECTION), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
-        
+
         if (querySnapshot.empty) {
             // Return default settings if none exist
             return {
@@ -35,21 +35,19 @@ export const getContactSettings = async () => {
                     { id: 'default-email-1', email: 'info@misslily.com', type: 'info', isActive: true },
                     { id: 'default-email-2', email: 'support@misslily.com', type: 'support', isActive: true }
                 ],
-                addresses: [
-                    {
-                        id: 'default-addr-1',
-                        street: '123 Fashion Street',
-                        city: 'Style City',
-                        state: 'SC',
-                        zipCode: '12345',
-                        country: 'India',
-                        type: 'main',
-                        isActive: true
-                    }
-                ]
+                addresses: [{
+                    id: 'default-addr-1',
+                    street: '123 Fashion Street',
+                    city: 'Style City',
+                    state: 'SC',
+                    zipCode: '12345',
+                    country: 'India',
+                    type: 'main',
+                    isActive: true
+                }]
             };
         }
-        
+
         // Get the most recent settings document
         const latestDoc = querySnapshot.docs[0];
         return latestDoc.data();
@@ -59,7 +57,7 @@ export const getContactSettings = async () => {
     }
 };
 
-export const updateContactSettings = async (settings) => {
+export const updateContactSettings = async(settings) => {
     try {
         // Create or update settings document
         const settingsDoc = {
@@ -69,7 +67,7 @@ export const updateContactSettings = async (settings) => {
         };
 
         const docRef = await addDoc(collection(db, SETTINGS_COLLECTION), settingsDoc);
-        console.log('Contact settings updated with ID:', docRef.id);
+
         return docRef.id;
     } catch (error) {
         console.error('Error updating contact settings:', error);
@@ -78,7 +76,7 @@ export const updateContactSettings = async (settings) => {
 };
 
 // ============ INDIVIDUAL CONTACT MANAGEMENT ============
-export const addPhone = async (phoneData) => {
+export const addPhone = async(phoneData) => {
     try {
         const settings = await getContactSettings();
         const newPhone = {
@@ -87,7 +85,7 @@ export const addPhone = async (phoneData) => {
             isActive: true,
             createdAt: new Date()
         };
-        
+
         settings.phones.push(newPhone);
         await updateContactSettings(settings);
         return newPhone.id;
@@ -97,13 +95,13 @@ export const addPhone = async (phoneData) => {
     }
 };
 
-export const updatePhone = async (phoneId, phoneData) => {
+export const updatePhone = async(phoneId, phoneData) => {
     try {
         const settings = await getContactSettings();
         const phoneIndex = settings.phones.findIndex(p => p.id === phoneId);
-        
+
         if (phoneIndex !== -1) {
-            settings.phones[phoneIndex] = { ...settings.phones[phoneIndex], ...phoneData };
+            settings.phones[phoneIndex] = {...settings.phones[phoneIndex], ...phoneData };
             await updateContactSettings(settings);
         }
     } catch (error) {
@@ -112,7 +110,7 @@ export const updatePhone = async (phoneId, phoneData) => {
     }
 };
 
-export const deletePhone = async (phoneId) => {
+export const deletePhone = async(phoneId) => {
     try {
         const settings = await getContactSettings();
         settings.phones = settings.phones.filter(p => p.id !== phoneId);
@@ -123,7 +121,7 @@ export const deletePhone = async (phoneId) => {
     }
 };
 
-export const addWhatsApp = async (whatsappData) => {
+export const addWhatsApp = async(whatsappData) => {
     try {
         const settings = await getContactSettings();
         const newWhatsApp = {
@@ -132,7 +130,7 @@ export const addWhatsApp = async (whatsappData) => {
             isActive: true,
             createdAt: new Date()
         };
-        
+
         settings.whatsapp.push(newWhatsApp);
         await updateContactSettings(settings);
         return newWhatsApp.id;
@@ -142,13 +140,13 @@ export const addWhatsApp = async (whatsappData) => {
     }
 };
 
-export const updateWhatsApp = async (whatsappId, whatsappData) => {
+export const updateWhatsApp = async(whatsappId, whatsappData) => {
     try {
         const settings = await getContactSettings();
         const whatsappIndex = settings.whatsapp.findIndex(w => w.id === whatsappId);
-        
+
         if (whatsappIndex !== -1) {
-            settings.whatsapp[whatsappIndex] = { ...settings.whatsapp[whatsappIndex], ...whatsappData };
+            settings.whatsapp[whatsappIndex] = {...settings.whatsapp[whatsappIndex], ...whatsappData };
             await updateContactSettings(settings);
         }
     } catch (error) {
@@ -157,7 +155,7 @@ export const updateWhatsApp = async (whatsappId, whatsappData) => {
     }
 };
 
-export const deleteWhatsApp = async (whatsappId) => {
+export const deleteWhatsApp = async(whatsappId) => {
     try {
         const settings = await getContactSettings();
         settings.whatsapp = settings.whatsapp.filter(w => w.id !== whatsappId);
@@ -168,7 +166,7 @@ export const deleteWhatsApp = async (whatsappId) => {
     }
 };
 
-export const addEmail = async (emailData) => {
+export const addEmail = async(emailData) => {
     try {
         const settings = await getContactSettings();
         const newEmail = {
@@ -177,7 +175,7 @@ export const addEmail = async (emailData) => {
             isActive: true,
             createdAt: new Date()
         };
-        
+
         settings.emails.push(newEmail);
         await updateContactSettings(settings);
         return newEmail.id;
@@ -187,13 +185,13 @@ export const addEmail = async (emailData) => {
     }
 };
 
-export const updateEmail = async (emailId, emailData) => {
+export const updateEmail = async(emailId, emailData) => {
     try {
         const settings = await getContactSettings();
         const emailIndex = settings.emails.findIndex(e => e.id === emailId);
-        
+
         if (emailIndex !== -1) {
-            settings.emails[emailIndex] = { ...settings.emails[emailIndex], ...emailData };
+            settings.emails[emailIndex] = {...settings.emails[emailIndex], ...emailData };
             await updateContactSettings(settings);
         }
     } catch (error) {
@@ -202,7 +200,7 @@ export const updateEmail = async (emailId, emailData) => {
     }
 };
 
-export const deleteEmail = async (emailId) => {
+export const deleteEmail = async(emailId) => {
     try {
         const settings = await getContactSettings();
         settings.emails = settings.emails.filter(e => e.id !== emailId);
@@ -213,7 +211,7 @@ export const deleteEmail = async (emailId) => {
     }
 };
 
-export const addAddress = async (addressData) => {
+export const addAddress = async(addressData) => {
     try {
         const settings = await getContactSettings();
         const newAddress = {
@@ -222,7 +220,7 @@ export const addAddress = async (addressData) => {
             isActive: true,
             createdAt: new Date()
         };
-        
+
         settings.addresses.push(newAddress);
         await updateContactSettings(settings);
         return newAddress.id;
@@ -232,13 +230,13 @@ export const addAddress = async (addressData) => {
     }
 };
 
-export const updateAddress = async (addressId, addressData) => {
+export const updateAddress = async(addressId, addressData) => {
     try {
         const settings = await getContactSettings();
         const addressIndex = settings.addresses.findIndex(a => a.id === addressId);
-        
+
         if (addressIndex !== -1) {
-            settings.addresses[addressIndex] = { ...settings.addresses[addressIndex], ...addressData };
+            settings.addresses[addressIndex] = {...settings.addresses[addressIndex], ...addressData };
             await updateContactSettings(settings);
         }
     } catch (error) {
@@ -247,7 +245,7 @@ export const updateAddress = async (addressId, addressData) => {
     }
 };
 
-export const deleteAddress = async (addressId) => {
+export const deleteAddress = async(addressId) => {
     try {
         const settings = await getContactSettings();
         settings.addresses = settings.addresses.filter(a => a.id !== addressId);

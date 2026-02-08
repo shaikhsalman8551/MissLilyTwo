@@ -20,7 +20,8 @@ import {
     deleteDoc,
     query,
     where,
-    orderBy
+    orderBy,
+    onSnapshot
 } from 'firebase/firestore';
 import { compressImage, validateImageFile } from '../utils/imageUtils';
 
@@ -64,8 +65,11 @@ export const addProduct = async(productData, imageFiles) => {
 
         const docRef = await addDoc(collection(db, 'products'), productDoc);
 
-
-        return docRef.id;
+        // Return the complete product object with ID
+        return {
+            id: docRef.id,
+            ...productDoc
+        };
     } catch (error) {
         console.error('Error adding product:', error);
         throw error;
@@ -102,15 +106,12 @@ export const getProductById = async(id) => {
 
 export const updateProduct = async(id, productData, newImageFiles = [], existingImages = []) => {
     try {
-
-
         let imageUrls = [...existingImages];
 
         // Add new images if any using compression and base64 encoding
         if (newImageFiles && newImageFiles.length > 0) {
             for (let i = 0; i < newImageFiles.length; i++) {
                 const file = newImageFiles[i];
-                (`Processing new image:`, file.name);
 
                 // Validate file
                 const validation = validateImageFile(file, 5);
@@ -137,21 +138,28 @@ export const updateProduct = async(id, productData, newImageFiles = [], existing
             updatedAt: new Date()
         };
 
-        console.log('Updating product document:', productDoc);
-
         await updateDoc(doc(db, 'products', id), productDoc);
         console.log('Product updated successfully');
 
+        // Return the updated product object
+        return {
+            id,
+            ...productDoc
+        };
     } catch (error) {
         console.error('Error updating product:', error);
         throw error;
     }
 };
 
-export const deleteProduct = async(id) => {
+export const deleteProduct = async(id, images = []) => {
     try {
         // Storage disabled - just delete the document
+        // Images parameter kept for compatibility but not used
         await deleteDoc(doc(db, 'products', id));
+
+        // Return success indicator
+        return { success: true };
     } catch (error) {
         console.error('Error deleting product:', error);
         throw error;
@@ -179,13 +187,12 @@ export const getProductsByCategory = async(categoryId) => {
 // ============ CATEGORIES ============
 export const addCategory = async(categoryData, iconFile = null) => {
     try {
-        console.log('Adding category:', categoryData);
-        console.log('Icon file:', iconFile);
+
 
         let iconUrl = '';
 
         if (iconFile) {
-            console.log('Processing category icon:', iconFile.name);
+
 
             // Validate file
             const validation = validateImageFile(iconFile, 2);
@@ -233,10 +240,10 @@ export const getAllCategories = async() => {
 
 export const updateCategory = async(id, categoryData, iconFile = null) => {
     try {
-        let iconUrl = categoryData.icon || '';
+        let iconUrl = categoryData.icon; // Use existing icon from categoryData
 
         if (iconFile) {
-            console.log('Processing category icon for update:', iconFile.name);
+
 
             // Validate file
             const validation = validateImageFile(iconFile, 2);
@@ -256,7 +263,7 @@ export const updateCategory = async(id, categoryData, iconFile = null) => {
 
         await updateDoc(doc(db, 'categories', id), {
             ...categoryData,
-            icon: iconUrl,
+            icon: iconUrl, // This will be existing icon if no new file, or new icon if file provided
             updatedAt: new Date()
         });
     } catch (error) {
@@ -339,4 +346,138 @@ export const getAllUserInquiries = async() => {
         console.error('Error fetching user inquiries:', error);
         throw error;
     }
+};
+
+// ============ REAL-TIME LISTENERS ============
+export const subscribeToProducts = (callback) => {
+    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (querySnapshot) => {
+        const products = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(products);
+    }, (error) => {
+        console.error('Error in products subscription:', error);
+    });
+};
+
+export const subscribeToCategories = (callback) => {
+    const q = query(collection(db, 'categories'), orderBy('name', 'asc'));
+    return onSnapshot(q, (querySnapshot) => {
+        const categories = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(categories);
+    }, (error) => {
+        console.error('Error in categories subscription:', error);
+    });
+};
+
+export const subscribeToUserInquiries = (callback) => {
+    const q = query(collection(db, 'userInquiries'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (querySnapshot) => {
+        const inquiries = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(inquiries);
+    }, (error) => {
+        console.error('Error in inquiries subscription:', error);
+    });
+};
+
+export const subscribeToContactMessages = (callback) => {
+    const q = query(collection(db, 'contactMessages'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (querySnapshot) => {
+        const messages = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(messages);
+    }, (error) => {
+        console.error('Error in contact messages subscription:', error);
+    });
+};
+
+export const subscribeToDashboardStats = (callback) => {
+    let products = [];
+    let categories = [];
+    let inquiries = [];
+    let messages = [];
+    let completed = 0;
+    let isInitialized = false;
+
+    const updateStats = () => {
+        const stats = {
+            totalProducts: products.length,
+            totalCategories: categories.length,
+            totalInquiries: inquiries.filter(inquiry => inquiry.status === 'pending').length,
+            totalContacts: messages.filter(contact => contact.status === 'unread').length,
+            recentProducts: products.slice(0, 5),
+            recentInquiries: inquiries.slice(0, 5),
+            recentMessages: messages.slice(0, 5),
+            topCategories: categories
+                .map(cat => ({
+                    ...cat,
+                    productCount: products.filter(product => product.categoryId === cat.id).length
+                }))
+                .sort((a, b) => b.productCount - a.productCount)
+                .slice(0, 5)
+        };
+
+        callback(stats);
+    };
+
+    const checkComplete = () => {
+        completed++;
+        if (completed === 4) {
+            isInitialized = true;
+            updateStats();
+        }
+    };
+
+    const unsubscribeProducts = subscribeToProducts((data) => {
+        products = data;
+        if (isInitialized) {
+            updateStats();
+        } else {
+            checkComplete();
+        }
+    });
+
+    const unsubscribeCategories = subscribeToCategories((data) => {
+        categories = data;
+        if (isInitialized) {
+            updateStats();
+        } else {
+            checkComplete();
+        }
+    });
+
+    const unsubscribeInquiries = subscribeToUserInquiries((data) => {
+        inquiries = data;
+        if (isInitialized) {
+            updateStats();
+        } else {
+            checkComplete();
+        }
+    });
+
+    const unsubscribeMessages = subscribeToContactMessages((data) => {
+        messages = data;
+        if (isInitialized) {
+            updateStats();
+        } else {
+            checkComplete();
+        }
+    });
+
+    return () => {
+        unsubscribeProducts();
+        unsubscribeCategories();
+        unsubscribeInquiries();
+        unsubscribeMessages();
+    };
 };

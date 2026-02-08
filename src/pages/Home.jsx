@@ -119,32 +119,56 @@ const Home = () => {
           {loading ? (
             <Shimmer type="category" count={8} className="py-20" />
           ) : categories.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-              {categories.map(cat => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {categories.map((cat, index) => (
                 <Link
                   key={cat.id}
                   to={`/products?category=${cat.id}`}
-                  className="bg-white rounded-xl shadow-md hover:shadow-xl transition group overflow-hidden"
+                  className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-1 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className="h-32 flex items-center justify-center bg-gradient-to-br from-pink-50 to-rose-50 p-4">
+                  {/* Category Image/Icon */}
+                  <div className="relative h-40 bg-gradient-to-br from-pink-50 to-rose-50 overflow-hidden">
                     {cat.icon ? (
                       cat.icon.startsWith('http') || cat.icon.startsWith('data:') ? (
-                        <img src={cat.icon} alt={cat.name} className="w-20 h-20 object-cover rounded-lg group-hover:scale-110 transition-transform" />
+                        <img 
+                          src={cat.icon} 
+                          alt={cat.name} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        />
                       ) : (
-                        <span className="text-5xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                        <span className="text-5xl text-pink-600 group-hover:scale-110 transition-transform duration-500 block w-full h-full flex items-center justify-center">
+                          {cat.icon}
+                        </span>
                       )
                     ) : (
-                      <FaTshirt className="text-4xl text-pink-600 group-hover:scale-110 transition-transform" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <FaTshirt className="text-5xl text-pink-600 group-hover:scale-110 transition-transform duration-500" />
+                      </div>
                     )}
+                    
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    {/* Product Count Badge */}
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-700 shadow-md">
+                      {featuredProducts.filter(p => p.categoryId === cat.id).length} products
+                    </div>
                   </div>
                   
+                  {/* Category Details */}
                   <div className="p-4 text-center">
-                    <h3 className="font-semibold text-gray-800 group-hover:text-pink-600 transition">
+                    <h3 className="font-bold text-gray-800 group-hover:text-pink-600 transition-colors duration-300 text-lg mb-2">
                       {cat.name}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
                       {cat.description}
                     </p>
+                  </div>
+                  
+                  {/* Hover Arrow */}
+                  <div className="absolute bottom-3 right-3 bg-pink-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <FaArrowRight className="text-xs" />
                   </div>
                 </Link>
               ))}

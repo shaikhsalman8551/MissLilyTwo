@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getAllProducts, getAllCategories } from '../services/firebaseService';
 import ProductCard from '../components/ProductCard';
 import { FaSearch, FaTag, FaTshirt } from 'react-icons/fa';
+import useDebounce from '../hooks/useDebounce';
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +17,7 @@ const Products = () => {
   const [priceSort, setPriceSort] = useState('none'); // none, low-to-high, high-to-low
   const [discountFilter, setDiscountFilter] = useState('all'); // all, discounted
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300); // 300ms delay
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,10 +45,10 @@ const Products = () => {
     }
 
     // Search filter
-    if (searchTerm) {
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase())
+        p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        p.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       );
     }
 
@@ -71,7 +73,7 @@ const Products = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [products, selectedCategory, priceSort, discountFilter, searchTerm]);
+  }, [products, selectedCategory, priceSort, discountFilter, debouncedSearchTerm]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,9 +155,9 @@ const Products = () => {
                 <p className="text-gray-600 text-sm sm:text-base">Loading products...</p>
               </div>
             ) : filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
                 {filteredProducts.map((product, index) => (
-                  <div key={product.id} className="animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  <div key={product.id} className="animate-fade-in h-full" style={{animationDelay: `${index * 0.1}s`}}>
                     <ProductCard product={product} />
                   </div>
                 ))}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllContactMessages, updateContactMessageStatus } from '../services/firebaseService';
 import { formatDistanceToNow } from 'date-fns';
+import AdminLayout from '../components/AdminLayout';
 
 const ContactMessagesPage = () => {
   const navigate = useNavigate();
@@ -39,18 +40,10 @@ const ContactMessagesPage = () => {
   };
 
   return (
+    <AdminLayout title={"Customer Inquires"}>
+
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-gray-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Contact Messages</h1>
-          <button
-            onClick={() => navigate('/admin/dashboard')}
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
-          >
-            Back
-          </button>
-        </div>
-      </nav>
+   
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -158,6 +151,7 @@ const ContactMessagesPage = () => {
         </div>
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

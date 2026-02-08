@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 // User Pages
 import Home from './pages/Home';
 import Products from './pages/Products';
+import Categories from './pages/Categories';
 import ContactUs from './pages/ContactUs';
 import WhereWeAre from './pages/WhereWeAre';
 import Showcase from './pages/Showcase';
@@ -39,6 +40,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/products" element={<Products />} />
+                    <Route path="/categories" element={<Categories />} />
                     <Route path="/contact" element={<ContactUs />} />
                     <Route path="/where-we-are" element={<WhereWeAre />} />
                     <Route path="/showcase" element={<Showcase />} />

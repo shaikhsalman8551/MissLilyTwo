@@ -44,8 +44,7 @@ const UserInfoModal = ({ isOpen, onClose, product }) => {
                                 return errors;
                             }}
                             onSubmit={(values, { setSubmitting }) => {
-                                // Handle form submission logic here
-                                console.log('User Info:', values);
+                              
                                 setSubmitting(false);
                                 onClose();
                             }}

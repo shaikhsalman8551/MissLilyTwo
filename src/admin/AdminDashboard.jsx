@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTshirt, FaBox, FaTags, FaInstagram, FaClock, FaEnvelope, FaArrowLeft, FaListAlt, FaCog, FaFolder, FaComments } from 'react-icons/fa';
-import { getAllProducts, getAllCategories, getAllUserInquiries, getAllContactMessages } from '../services/firebaseService';
+import { FaTshirt, FaBox, FaTags, FaInstagram, FaClock, FaEnvelope, FaArrowLeft, FaListAlt, FaCog, FaFolder, FaComments, FaChartBar, FaChartLine, FaBars } from 'react-icons/fa';
+import { getAllProducts, getAllCategories, getAllUserInquiries, getAllContactMessages, subscribeToDashboardStats } from '../services/firebaseService';
 import { SimpleBarChart, SimplePieChart, StatsCard } from '../components/Charts';
+import { ShimmerStatsCard, ShimmerChart, ShimmerList, ShimmerGrid } from '../components/ShimmerEffects';
+import AdminSidebar from '../components/AdminSidebar';
+import ReportsPage from './ReportsPage';
+import AdminLayout from '../components/AdminLayout';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +23,8 @@ const AdminDashboard = () => {
     monthlyStats: []
   });
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -27,8 +33,33 @@ const AdminDashboard = () => {
       navigate('/admin-login');
       return;
     }
+    
+    // Set up real-time subscription
+    const unsubscribe = subscribeToDashboardStats((dashboardData) => {
+      setStats({
+        totalProducts: dashboardData.totalProducts,
+        totalCategories: dashboardData.totalCategories,
+        totalInquiries: dashboardData.totalInquiries,
+        totalContacts: dashboardData.totalContacts
+      });
+      
+      setReports({
+        recentProducts: dashboardData.recentProducts,
+        recentInquiries: dashboardData.recentInquiries,
+        recentMessages: dashboardData.recentMessages,
+        topCategories: dashboardData.topCategories,
+        monthlyStats: [] // Can be enhanced later
+      });
+      
+      setLoading(false);
+      setInitialLoad(false);
+    });
+    
+    // Initial fetch for immediate display
     fetchStats();
-  },[])
+    
+    return () => unsubscribe();
+  }, [])
 
     // Fetch dashboard statistics
     const fetchStats = async () => {
@@ -83,99 +114,20 @@ const AdminDashboard = () => {
 
   
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminEmail');
-    navigate('/admin-login');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Admin Navbar */}
-      <nav className="bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-           
-            <h1 className="text-2xl font-bold">Miss Lily 2 Admin</h1>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg transition-all duration-300 hover:shadow-lg"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+   
+      // <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} >
+      <AdminLayout title={"Dashboard"}>
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-0">
+        {/* Mobile Header */}
+       
 
-      <div className="max-w-7xl mx-auto px-6 pt-8 pb-12">
-        {/* Sidebar Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <button
-            onClick={() => navigate('/admin/products')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105 group"
-          >
-            <FaBox className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-lg font-semibold text-gray-800">Products</h3>
-            <p className="text-sm text-gray-600">Manage product catalog</p>
-          </button>
-
-          <button
-            onClick={() => navigate('/admin/categories')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105 group"
-          >
-            <FaTags className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-lg font-semibold text-gray-800">Categories</h3>
-            <p className="text-sm text-gray-600">Organize product categories</p>
-          </button>
-
-          <button
-            onClick={() => navigate('/admin/inquiries')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105 group"
-          >
-            <FaListAlt className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-lg font-semibold text-gray-800">Inquiries</h3>
-            <p className="text-sm text-gray-600">View customer inquiries</p>
-          </button>
-
-          <button
-            onClick={() => navigate('/admin/contact-messages')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105 group"
-          >
-            <FaEnvelope className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-lg font-semibold text-gray-800">Messages</h3>
-            <p className="text-sm text-gray-600">Contact form submissions</p>
-          </button>
-
-          <button
-            onClick={() => navigate('/admin/instagram')}
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105 group"
-          >
-            <FaInstagram className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-            <h3 className="text-lg font-semibold text-gray-800">Instagram</h3>
-            <p className="text-sm text-gray-600">Manage Instagram settings</p>
+   
          
-         </button>
 
-          <button
-            onClick={() => navigate('/admin/business-hours')}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 text-center group hover:scale-105"
-          >
-            <FaClock className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-        
-            <h3 className="font-semibold text-gray-800">Business Hours</h3>
-            <p className="text-sm text-gray-500">Manage hours</p>
-          </button>
-
-          <button
-            onClick={() => navigate('/admin/contact-settings')}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-all duration-300 text-center group hover:scale-105"
-          >
-             <FaCog className="text-3xl text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
-         
-            <h3 className="font-semibold text-gray-800">Settings</h3>
-            <p className="text-sm text-gray-500">Contact settings</p>
-          </button>
-        </div>
+        <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-12 max-w-full">
+          {/* Removed redirect cards - now using sidebar */}
 
    
 
@@ -316,50 +268,68 @@ const AdminDashboard = () => {
         {activeTab === 'overview' && (
           <div className="mt-8 space-y-6">
             {/* Quick Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                   onClick={() => navigate('/admin/products')}>
-                <div className="flex items-center justify-between mb-4">
-                  <FaBox className="text-3xl opacity-80" />
-                  <span className="text-2xl font-bold">{stats.totalProducts}</span>
-                </div>
-                <h3 className="text-lg font-semibold">Total Products</h3>
-                <p className="text-sm opacity-90">Click to manage →</p>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              {initialLoad ? (
+                <ShimmerGrid cols={4} items={4} />
+              ) : (
+                <>
+                  <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                       onClick={() => navigate('/admin/products')}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <FaBox className="text-3xl opacity-80" />
+                        <span className="text-2xl font-bold">{stats.totalProducts}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold">Total Products</h3>
+                      <p className="text-sm opacity-90">Click to manage →</p>
+                    </div>
+                  </div>
 
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                   onClick={() => navigate('/admin/categories')}>
-                <div className="flex items-center justify-between mb-4">
-                  <FaFolder className="text-3xl opacity-80" />
-                  <span className="text-2xl font-bold">{stats.totalCategories}</span>
-                </div>
-                <h3 className="text-lg font-semibold">Categories</h3>
-                <p className="text-sm opacity-90">Click to manage →</p>
-              </div>
+                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                       onClick={() => navigate('/admin/categories')}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <FaFolder className="text-3xl opacity-80" />
+                        <span className="text-2xl font-bold">{stats.totalCategories}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold">Categories</h3>
+                      <p className="text-sm opacity-90">Click to manage →</p>
+                    </div>
+                  </div>
 
-              <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                   onClick={() => navigate('/admin/inquiries')}>
-                <div className="flex items-center justify-between mb-4">
-                  <FaComments className="text-3xl opacity-80" />
-                  <span className="text-2xl font-bold">{stats.totalInquiries}</span>
-                </div>
-                <h3 className="text-lg font-semibold">Pending Inquiries</h3>
-                <p className="text-sm opacity-90">Click to review →</p>
-              </div>
+                  <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                       onClick={() => navigate('/admin/inquiries')}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <FaComments className="text-3xl opacity-80" />
+                        <span className="text-2xl font-bold">{stats.totalInquiries}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold">Pending Inquiries</h3>
+                      <p className="text-sm opacity-90">Click to review →</p>
+                    </div>
+                  </div>
 
-              <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                   onClick={() => navigate('/admin/contact-messages')}>
-                <div className="flex items-center justify-between mb-4">
-                  <FaEnvelope className="text-3xl opacity-80" />
-                  <span className="text-2xl font-bold">{stats.totalContacts}</span>
-                </div>
-                <h3 className="text-lg font-semibold">Unread Messages</h3>
-                <p className="text-sm opacity-90">Click to view →</p>
-              </div>
+                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                       onClick={() => navigate('/admin/contact-messages')}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <FaEnvelope className="text-3xl opacity-80" />
+                        <span className="text-2xl font-bold">{stats.totalContacts}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold">Unread Messages</h3>
+                      <p className="text-sm opacity-90">Click to view →</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Latest Activity Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
               {/* Recent Products */}
               <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
@@ -375,25 +345,31 @@ const AdminDashboard = () => {
                   </button>
                 </div>
                 <div className="space-y-3">
-                  {reports.recentProducts.slice(0, 3).map((product, index) => (
-                    <div 
-                      key={product.id} 
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
-                      onClick={() => navigate(`/admin/products?edit=${product.id}`)}
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800 truncate">{product.name}</p>
-                        <p className="text-sm text-gray-500">₹{product.price}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        product.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                      }`}>
-                        {product.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </div>
-                  ))}
-                  {reports.recentProducts.length === 0 && (
-                    <p className="text-gray-500 text-center py-4">No products yet</p>
+                  {initialLoad ? (
+                    <ShimmerList items={3} lines={2} />
+                  ) : (
+                    <>
+                      {reports.recentProducts.slice(0, 3).map((product, index) => (
+                        <div 
+                          key={product.id} 
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
+                          onClick={() => navigate(`/admin/products?edit=${product.id}`)}
+                        >
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800 truncate">{product.name}</p>
+                            <p className="text-sm text-gray-500">₹{product.price}</p>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            product.isActive ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                          }`}>
+                            {product.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      ))}
+                      {reports.recentProducts.length === 0 && (
+                        <p className="text-gray-500 text-center py-4">No products yet</p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -413,27 +389,33 @@ const AdminDashboard = () => {
                   </button>
                 </div>
                 <div className="space-y-3">
-                  {reports.recentInquiries.slice(0, 3).map((inquiry, index) => (
-                    <div 
-                      key={inquiry.id} 
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
-                      onClick={() => navigate(`/admin/inquiries?view=${inquiry.id}`)}
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800 truncate">{inquiry.fullName}</p>
-                        <p className="text-sm text-gray-500">{inquiry.email}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        inquiry.status === 'pending' 
-                          ? 'bg-yellow-100 text-yellow-600' 
-                          : 'bg-green-100 text-green-600'
-                      }`}>
-                        {inquiry.status}
-                      </span>
-                    </div>
-                  ))}
-                  {reports.recentInquiries.length === 0 && (
-                    <p className="text-gray-500 text-center py-4">No inquiries yet</p>
+                  {initialLoad ? (
+                    <ShimmerList items={3} lines={2} />
+                  ) : (
+                    <>
+                      {reports.recentInquiries.slice(0, 3).map((inquiry, index) => (
+                        <div 
+                          key={inquiry.id} 
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
+                          onClick={() => navigate(`/admin/inquiries?view=${inquiry.id}`)}
+                        >
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800 truncate">{inquiry.fullName}</p>
+                            <p className="text-sm text-gray-500">{inquiry.email}</p>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            inquiry.status === 'pending' 
+                              ? 'bg-yellow-100 text-yellow-600' 
+                              : 'bg-green-100 text-green-600'
+                          }`}>
+                            {inquiry.status}
+                          </span>
+                        </div>
+                      ))}
+                      {reports.recentInquiries.length === 0 && (
+                        <p className="text-gray-500 text-center py-4">No inquiries yet</p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -453,38 +435,48 @@ const AdminDashboard = () => {
                   </button>
                 </div>
                 <div className="space-y-3">
-                  {reports.recentMessages && reports.recentMessages.slice(0, 3).map((message, index) => (
-                    <div 
-                      key={message.id} 
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
-                      onClick={() => navigate(`/admin/contact-messages?view=${message.id}`)}
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800 truncate">{message.name || message.fullName || 'Anonymous'}</p>
-                        <p className="text-sm text-gray-500">{message.email}</p>
-                        <p className="text-xs text-gray-400 mt-1 truncate">{message.message || message.subject || 'No subject'}</p>
-                      </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        message.status === 'unread' 
-                          ? 'bg-blue-100 text-blue-600' 
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {message.status || 'new'}
-                      </span>
-                    </div>
-                  ))}
-                  {(!reports.recentMessages || reports.recentMessages.length === 0) && (
-                    <p className="text-gray-500 text-center py-4">No messages yet</p>
+                  {initialLoad ? (
+                    <ShimmerList items={3} lines={3} />
+                  ) : (
+                    <>
+                      {reports.recentMessages && reports.recentMessages.slice(0, 3).map((message, index) => (
+                        <div 
+                          key={message.id} 
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer hover:shadow-md"
+                          onClick={() => navigate(`/admin/contact-messages?view=${message.id}`)}
+                        >
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-800 truncate">{message.name || message.fullName || 'Anonymous'}</p>
+                            <p className="text-sm text-gray-500">{message.email}</p>
+                            <p className="text-xs text-gray-400 mt-1 truncate">{message.message || message.subject || 'No subject'}</p>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            message.status === 'unread' 
+                              ? 'bg-blue-100 text-blue-600' 
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {message.status || 'new'}
+                          </span>
+                        </div>
+                      ))}
+                      {(!reports.recentMessages || reports.recentMessages.length === 0) && (
+                        <p className="text-gray-500 text-center py-4">No messages yet</p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Quick Actions - Removed redundant section since stats cards are now clickable */}
+       <ReportsPage />
           </div>
         )}
+        </div>
       </div>
-    </div>
+      
+
+      </AdminLayout>
+  
   );
 };
 

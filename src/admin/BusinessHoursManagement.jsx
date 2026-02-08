@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBusinessHours, saveBusinessHours, defaultBusinessHours } from '../services/businessHoursService';
 import { FaClock, FaSave, FaTimes, FaPlus, FaMinus, FaArrowLeft } from 'react-icons/fa';
+import AdminLayout from '../components/AdminLayout';
 
 const BusinessHoursManagement = () => {
   const navigate = useNavigate();
@@ -39,15 +40,6 @@ const BusinessHoursManagement = () => {
     }));
   };
 
-  const handleHolidayChange = (field, value) => {
-    setBusinessHours(prev => ({
-      ...prev,
-      holidays: {
-        ...prev.holidays,
-        [field]: value
-      }
-    }));
-  };
 
   const handleSpecialInstructionsChange = (value) => {
     setBusinessHours(prev => ({
@@ -107,35 +99,23 @@ const BusinessHoursManagement = () => {
     { key: 'sunday', label: 'Sunday' }
   ];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading business hours...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/admin/dashboard')}
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              title="Back to Dashboard"
-            >
-              <FaArrowLeft className="text-gray-600" />
-            </button>
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <FaClock className="text-pink-600" />
-              Business Hours Management
-            </h2>
-          </div>
+  <>
+  <AdminLayout title={"Business Hours Management"}>
+            <div className="min-h-screen bg-gray-100 h-[500px]">
+   
+     {
+        loading ? (
+            <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading business hours...</p>
         </div>
+        ):(
+    
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="bg-white rounded-xl shadow-lg p-6">
+       
 
         {successMessage && (
           <div className="mb-4 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg">
@@ -249,33 +229,7 @@ const BusinessHoursManagement = () => {
             </div>
           </div>
 
-          {/* Holiday Settings */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Holiday Settings</h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <input
-                  type="checkbox"
-                  checked={businessHours.holidays.isOpen}
-                  onChange={(e) => handleHolidayChange('isOpen', e.target.checked)}
-                  className="w-4 h-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
-                />
-                <label className="font-medium text-gray-700">Open on holidays</label>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Holiday Note
-                </label>
-                <input
-                  type="text"
-                  value={businessHours.holidays.note}
-                  onChange={(e) => handleHolidayChange('note', e.target.value)}
-                  placeholder="e.g., Closed on holidays"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                />
-              </div>
-            </div>
-          </div>
+       
 
           {/* Special Instructions */}
           <div className="border-t pt-6">
@@ -312,6 +266,11 @@ const BusinessHoursManagement = () => {
         </form>
       </div>
     </div>
+        )}
+    </div>
+    </AdminLayout>
+    {/* </div> */}
+    </>
   );
 };
 

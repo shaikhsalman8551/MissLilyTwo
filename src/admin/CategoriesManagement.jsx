@@ -5,6 +5,8 @@ import * as Yup from 'yup';
 import { getAllCategories, addCategory, updateCategory, deleteCategory } from '../services/firebaseService';
 import {  FaTimes, FaPlus, FaTshirt, FaUpload } from 'react-icons/fa';
 import { showSuccess, showError, showConfirm, showLoading, closeLoading } from '../utils/notifications';
+import { debounce } from '../utils/debounce';
+import AdminLayout from '../components/AdminLayout';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Category name is required'),
@@ -14,11 +16,13 @@ const validationSchema = Yup.object().shape({
 const CategoriesManagement = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [iconFile, setIconFile] = useState(null);
   const [iconPreview, setIconPreview] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (!localStorage.getItem('adminLoggedIn')) {
@@ -28,10 +32,33 @@ const CategoriesManagement = () => {
     fetchCategories();
   }, [navigate]);
 
+  // Filter categories based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredCategories(categories);
+    } else {
+      const filtered = categories.filter(category => 
+        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+    }
+  }, [searchTerm, categories]);
+
+  // Debounced search handler
+  const debouncedSearch = debounce((value) => {
+    setSearchTerm(value);
+  }, 300);
+
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
   const fetchCategories = async () => {
     try {
       const cats = await getAllCategories();
       setCategories(cats);
+      setFilteredCategories(cats); // Initialize filtered categories
     } catch (error) {
       console.error(error);
       showError("Error", "Failed to load categories");
@@ -65,7 +92,12 @@ const CategoriesManagement = () => {
       };
 
       if (editingCategory) {
-        await updateCategory(editingCategory.id, data, iconFile);
+        // If no new icon is selected, preserve the existing one
+        const dataWithIcon = {
+          ...data,
+          icon: iconFile ? undefined : editingCategory.icon // Preserve existing icon if no new file
+        };
+        await updateCategory(editingCategory.id, dataWithIcon, iconFile);
         showSuccess("Success", "Category updated successfully");
       } else {
         await addCategory(data, iconFile);
@@ -115,35 +147,55 @@ const CategoriesManagement = () => {
     }
   };
 
+  const toggleCategoryStatus = async (category) => {
+    try {
+      showLoading('Updating Status', 'Please wait...');
+      
+      const updatedCategory = await updateCategory(category.id, {
+        ...category,
+        isActive: !category.isActive
+      });
+      
+      fetchCategories();
+      showSuccess('Success!', `Category ${!category.isActive ? 'activated' : 'deactivated'} successfully`);
+    } catch (error) {
+      console.error('Error toggling category status:', error);
+      showError('Error!', 'Failed to update category status: ' + error.message);
+    } finally {
+      closeLoading();
+    }
+  };
+
   return (
+    <AdminLayout title="Category Management">
+
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-gray-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-             Categories Management
-          </h1>
+     
+
+      <div className="max-w-7xl mx-auto px-4 ">
+        {/* Search and Add Category Button */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search categories by name or description..."
+              onChange={handleSearchChange}
+              className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          </div>
           <button
-            onClick={() => navigate('/admin/dashboard')}
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg"
+            onClick={() => {
+              setShowForm(!showForm);
+              setEditingCategory(null);
+              setIconPreview('');
+              setIconFile(null);
+              setSearchTerm(''); // Clear search when adding new
+            }}
+            className="bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-2 rounded-lg font-semibold"
           >
-             Back
+            {showForm ? <><FaTimes /> Cancel</> : <> Add New Category</>}
           </button>
         </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-
-        <button
-          onClick={() => {
-            setShowForm(!showForm);
-            setEditingCategory(null);
-            setIconPreview('');
-            setIconFile(null);
-          }}
-          className="mb-6 bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-2 rounded-lg font-semibold"
-        >
-          {showForm ? <><FaTimes /> Cancel</> : <><FaPlus /> Add New Category</>}
-        </button>
 
         {showForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -219,8 +271,8 @@ const CategoriesManagement = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {loading ? (
             <p>Loading...</p>
-          ) : categories.length > 0 ? (
-            categories.map(cat => {
+          ) : filteredCategories.length > 0 ? (
+            filteredCategories.map(cat => {
              
               return (
               <div key={cat.id} className="bg-white p-6 rounded-lg shadow-md">
@@ -248,6 +300,16 @@ const CategoriesManagement = () => {
                   <button onClick={() => handleEdit(cat)} className="flex-1 bg-blue-100 text-blue-700 py-1 rounded">
                     Edit
                   </button>
+                  <button 
+                    onClick={() => toggleCategoryStatus(cat)} 
+                    className={`flex-1 py-1 rounded text-xs font-semibold ${
+                      cat.isActive 
+                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                        : 'bg-green-100 text-green-700 hover:bg-green-200'
+                    }`}
+                  >
+                    {cat.isActive ? 'Deactivate' : 'Activate'}
+                  </button>
                   <button onClick={() => handleDelete(cat.id)} className="flex-1 bg-red-100 text-red-700 py-1 rounded">
                     Delete
                   </button>
@@ -262,6 +324,7 @@ const CategoriesManagement = () => {
 
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { getAllProducts, getAllCategories, getAllContactMessages, getAllUserInquiries } from '../services/firebaseService';
+import { getAllProducts, getAllCategories, getAllContactMessages, getAllUserInquiries, subscribeToDashboardStats } from '../services/firebaseService';
+import { ShimmerChart } from '../components/ShimmerEffects';
+import AdminLayout from '../components/AdminLayout';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -17,13 +19,44 @@ const ReportsPage = () => {
     priceDistribution: []
   });
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     if (!localStorage.getItem('adminLoggedIn')) {
       navigate('/admin-login');
       return;
     }
+    
+    // Set up real-time subscription
+    const unsubscribe = subscribeToDashboardStats((dashboardData) => {
+      const products = dashboardData.recentProducts || [];
+      const categories = dashboardData.topCategories || [];
+      const inquiries = dashboardData.recentInquiries || [];
+      const messages = dashboardData.recentMessages || [];
+
+      // Count products by category
+      const prodByCategory = categories.map(cat => ({
+        name: cat.name,
+        count: products.filter(p => p.categoryId === cat.id).length
+      }));
+
+      setStats({
+        totalProducts: dashboardData.totalProducts,
+        totalCategories: dashboardData.totalCategories,
+        totalInquiries: dashboardData.totalInquiries,
+        totalContacts: dashboardData.totalContacts,
+        productsByCategory: prodByCategory,
+        products: products
+      });
+      
+      setLoading(false);
+      setInitialLoad(false);
+    });
+    
+    // Initial fetch for immediate display
     fetchStats();
+    
+    return () => unsubscribe();
   }, [navigate]);
 
   const fetchStats = async () => {
@@ -91,53 +124,20 @@ const ReportsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-gray-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">📊 Reports & Analytics</h1>
-          <button
-            onClick={() => navigate('/admin/dashboard')}
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
-          >
-            ← Back
-          </button>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="">
         {loading ? (
           <p className="text-gray-500">Loading reports...</p>
         ) : (
           <>
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-6">
-                <p className="text-sm text-gray-600">Total Products</p>
-                <p className="text-4xl font-bold text-blue-600">{stats.totalProducts}</p>
-              </div>
-
-              <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-6">
-                <p className="text-sm text-gray-600">Total Categories</p>
-                <p className="text-4xl font-bold text-green-600">{stats.totalCategories}</p>
-              </div>
-
-              <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-6">
-                <p className="text-sm text-gray-600">Product Inquiries</p>
-                <p className="text-4xl font-bold text-yellow-600">{stats.totalInquiries}</p>
-              </div>
-
-              <div className="bg-pink-50 border-l-4 border-pink-500 rounded-lg p-6">
-                <p className="text-sm text-gray-600">Contact Messages</p>
-                <p className="text-4xl font-bold text-pink-600">{stats.totalContacts}</p>
-              </div>
-            </div>
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Pie Chart */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Products by Category</h2>
-                {stats.productsByCategory.length > 0 ? (
+                {initialLoad ? (
+                  <ShimmerChart />
+                ) : stats.productsByCategory.length > 0 ? (
                   <div className="relative h-80">
                     <Pie
                       data={pieChartData}
@@ -158,21 +158,25 @@ const ReportsPage = () => {
               {/* Bar Chart */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">Overall Statistics</h2>
-                <div className="relative h-80">
-                  <Bar
-                    data={barChartData}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: {
-                        legend: { display: true }
-                      },
-                      scales: {
-                        y: { beginAtZero: true }
-                      }
-                    }}
-                  />
-                </div>
+                {initialLoad ? (
+                  <ShimmerChart />
+                ) : (
+                  <div className="relative h-80">
+                    <Bar
+                      data={barChartData}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: { display: true }
+                        },
+                        scales: {
+                          y: { beginAtZero: true }
+                        }
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -216,7 +220,7 @@ const ReportsPage = () => {
           </>
         )}
       </div>
-    </div>
+  
   );
 };
 

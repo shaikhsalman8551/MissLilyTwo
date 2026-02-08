@@ -10,11 +10,15 @@ import {
   deleteProduct
 } from '../services/firebaseService';
 import { showSuccess, showError, showConfirm, showLoading, closeLoading } from '../utils/notifications';
+import { debounce } from '../utils/debounce';
+import AdminLayout from '../components/AdminLayout';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Product name is required'),
   description: Yup.string().required('Description is required'),
-  price: Yup.number().required('Price is required').positive(),
+  price: Yup.number().required('Price is required').positive().test('decimal', 'Please enter a valid price', value => {
+        return !isNaN(value) && parseFloat(value) >= 0;
+      }),
   categoryId: Yup.string().required('Category is required'),
   code: Yup.string().required('Cpde is required'),
   discount: Yup.number().min(0).max(100),
@@ -30,6 +34,9 @@ const ProductsManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
   const [initialValues, setInitialValues] = useState({
     name: '',
     description: '',
@@ -49,10 +56,38 @@ const ProductsManagement = () => {
     fetchData();
   }, [navigate]);
 
+  // Filter products based on search term
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(product => {
+        const productName = product.name || '';
+        const productCode = product.code || '';
+        const categoryName = product.category || '';
+        
+        return productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               productCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               categoryName.toLowerCase().includes(searchTerm.toLowerCase());
+      });
+      setFilteredProducts(filtered);
+    }
+  }, [searchTerm, products]);
+
+  // Debounced search handler
+  const debouncedSearch = debounce((value) => {
+    setSearchTerm(value);
+  }, 300);
+
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
   const fetchData = async () => {
     try {
       const prods = await getAllProducts();
       setProducts(prods);
+      setFilteredProducts(prods); // Initialize filtered products
       const cats = await getAllCategories();
       setCategories(cats);
     } catch (error) {
@@ -70,27 +105,29 @@ const ProductsManagement = () => {
       description: product.description || '',
       price: product.price || '',
       categoryId: product.categoryId || '',
-      discount: product.discount || 0,
-      code: product.code || 0,
-      stock: product.stock || '',
+      discount: Number(product.discount) || 0,
+      code: product.code || '',
+      stock: Number(product.stock) || 0,
       isActive: product.isActive !== false,
       images: product.images || []
     });
     setImageFiles([]);
+    setImagesToDelete([]);
     setShowForm(true);
   };
 
   const handleCancel = () => {
     setShowForm(false);
     setEditingId(null);
+    setImagesToDelete([]);
     setInitialValues({
       name: '',
       description: '',
       price: '',
       categoryId: '',
       discount: 0,
-      code:"",
       stock: '',
+      code:"",
       isActive: true
     });
     setImageFiles([]);
@@ -104,10 +141,21 @@ const ProductsManagement = () => {
         throw new Error('Please select a category for product');
       }
       
+      // Ensure proper type conversion
+      const processedValues = {
+        ...values,
+        discount: Number(values.discount) || 0,
+        price: Number(values.price),
+        stock: Number(values.stock),
+        isActive: values.isActive === 'true' || values.isActive === true
+      };
+      
       if (editingId) {
         // Get existing product to preserve images
         const existingProduct = products.find(p => p.id === editingId);
-        const updatedProduct = await updateProduct(editingId, values, imageFiles, existingProduct?.images || []);
+        // Filter out images marked for deletion from existing product images
+        const remainingImages = existingProduct?.images?.filter((_, index) => !imagesToDelete.includes(index)) || [];
+        const updatedProduct = await updateProduct(editingId, processedValues, imageFiles, remainingImages);
         
         // Update state immediately for real-time effect
         setProducts(prevProducts => 
@@ -116,7 +164,7 @@ const ProductsManagement = () => {
         
         showSuccess('Success!', 'Product updated successfully');
       } else {
-        const newProduct = await addProduct(values, imageFiles);
+        const newProduct = await addProduct(processedValues, imageFiles);
         
         // Add to state immediately for real-time effect
         setProducts(prevProducts => [newProduct, ...prevProducts]);
@@ -127,6 +175,7 @@ const ProductsManagement = () => {
       resetForm();
       setImageFiles([]);
       setEditingId(null);
+      setImagesToDelete([]);
       setShowForm(false);
       setInitialValues({
         name: '',
@@ -176,45 +225,78 @@ const ProductsManagement = () => {
     }
   };
 
+  const deleteCurrentImage = (imageIndex) => {
+    setImagesToDelete(prev => [...prev, imageIndex]);
+    setInitialValues(prev => ({
+      ...prev,
+      images: prev.images.filter((_, index) => index !== imageIndex)
+    }));
+  };
+
+  const toggleProductStatus = async (product) => {
+    try {
+      showLoading('Updating Status', 'Please wait...');
+      
+      const updatedProduct = await updateProduct(product.id, {
+        ...product,
+        isActive: !product.isActive
+      }, [], product.images || []);
+      
+      // Update state immediately for real-time effect
+      setProducts(prevProducts => 
+        prevProducts.map(p => p.id === product.id ? { ...p, ...updatedProduct } : p)
+      );
+      
+      showSuccess('Success!', `Product ${!product.isActive ? 'activated' : 'deactivated'} successfully`);
+    } catch (error) {
+      console.error('Error toggling product status:', error);
+      showError('Error!', 'Failed to update product status: ' + error.message);
+    } finally {
+      closeLoading();
+    }
+  };
+
   return (
+    <AdminLayout title="Product Management">
+
     <div className="min-h-screen bg-gray-100">
       {/* Admin Navbar */}
-      <nav className="bg-gray-900 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Products Management</h1>
+     
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        {/* Search and Add Product Button */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Search products by name, code, or category..."
+              onChange={handleSearchChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          </div>
           <button
-            onClick={() => navigate('/admin/dashboard')}
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition"
+            onClick={() => {
+              setShowForm(!showForm);
+              setEditingId(null);
+              if (!showForm) {
+                setInitialValues({
+                  name: '',
+                  description: '',
+                  price: '',
+                  categoryId: '',
+                  discount: 0,
+                  stock: '',
+                  code:"",
+                  isActive: true
+                });
+                setImageFiles([]);
+              }
+            }}
+            className="bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-pink-700 hover:to-rose-700 transition"
           >
-          Back
+            {showForm ? '✕ Cancel' : '+ Add New Product'}
           </button>
         </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Add Product Button */}
-        <button
-          onClick={() => {
-            setShowForm(!showForm);
-            setEditingId(null);
-            if (!showForm) {
-              setInitialValues({
-                name: '',
-                description: '',
-                price: '',
-                categoryId: '',
-                discount: 0,
-                stock: '',
-                code:"",
-                isActive: true
-              });
-              setImageFiles([]);
-            }
-          }}
-          className="mb-6 bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-pink-700 hover:to-rose-700 transition"
-        >
-          {showForm ? '✕ Cancel' : '+ Add New Product'}
-        </button>
 
         {/* Form */}
         {showForm && (
@@ -269,6 +351,8 @@ const ProductsManagement = () => {
                       <Field
                         name="price"
                         type="number"
+                        step="0.01"
+                        min="0"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         placeholder="1999"
                       />
@@ -322,8 +406,8 @@ const ProductsManagement = () => {
                         name="isActive"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                       >
-                        <option value={true}>Active</option>
-                        <option value={false}>Inactive</option>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
                       </Field>
                     </div>
                   </div>
@@ -371,7 +455,7 @@ const ProductsManagement = () => {
                                 const newFiles = imageFiles.filter((_, i) => i !== index);
                                 setImageFiles(newFiles);
                               }}
-                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center  transition"
                             >
                               ×
                             </button>
@@ -382,17 +466,24 @@ const ProductsManagement = () => {
                     )}
 
                     {/* Existing Images for Edit */}
-                    {editingId && initialValues.images && initialValues.images.length > 0 && (
+                    {editingId && values.images && values.images.length > 0 && (
                       <div className="mt-4">
                         <p className="text-sm font-medium text-gray-700 mb-2">Current Images:</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {initialValues.images.map((img, index) => (
-                            <div key={index} className="relative">
+                          {values.images.map((img, index) => (
+                            <div key={index} className="relative group">
                               <img
                                 src={img}
                                 alt={`Current ${index + 1}`}
                                 className="w-full h-32 object-cover rounded-lg border border-gray-200"
                               />
+                              <button
+                                type="button"
+                                onClick={() => deleteCurrentImage(index)}
+                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center  transition"
+                              >
+                                ×
+                              </button>
                               <p className="text-xs text-gray-500 mt-1">Image {index + 1}</p>
                             </div>
                           ))}
@@ -444,11 +535,14 @@ const ProductsManagement = () => {
                   <tr>
                     <td colSpan="7" className="px-6 py-4 text-center text-gray-500">Loading...</td>
                   </tr>
-                ) : products.length > 0 ? (
-                  products.map(product => (
+                ) : filteredProducts.length > 0 ? (
+                  filteredProducts.map(product => {
+                    const category = categories.find(cat => cat.id === product.categoryId);
+                    const categoryName = category ? category.name : '';
+                    return (
                     <tr key={product.id} className="border-t hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm text-gray-800">{product.name}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{product.category || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{categoryName || '-'}</td>
                       <td className="px-6 py-4 text-sm text-gray-800">₹{product.price}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{product.discount || 0}%</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{product.stock}</td>
@@ -460,23 +554,34 @@ const ProductsManagement = () => {
                       </td>
                       <td className="px-6 py-4 text-sm space-x-2">
                         <button
+                          onClick={() => toggleProductStatus(product)}
+                          className={`px-3 py-1 rounded text-xs font-semibold ${
+                            product.isActive !== false 
+                              ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        >
+                          {product.isActive !== false ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button
                           onClick={() => handleEdit(product)}
-                          className="text-blue-600 hover:text-blue-800 font-semibold"
+                          className="bg-blue-600 px-3 py-1 rounded text-white hover:text-blue-200 font-semibold"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(product.id, product.images || [])}
-                          className="text-red-600 hover:text-red-800 font-semibold"
-                        >
+                                                    className="bg-red-600 px-3 py-1 rounded text-white hover:text-red-200 font-semibold"
+  >
                           Delete
                         </button>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-4 text-center text-gray-500">No products found</td>
+                    <td colSpan="8" className="px-6 py-4 text-center text-gray-500">No products found</td>
                   </tr>
                 )}
               </tbody>
@@ -485,6 +590,7 @@ const ProductsManagement = () => {
         </div>
       </div>
     </div>
+    </AdminLayout>
   );
 };
 

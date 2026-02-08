@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaInstagram, FaSave, FaTimes, FaPlus, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { getInstagramConfig, saveInstagramConfig, defaultInstagramConfig } from '../services/instagramService';
+import AdminLayout from '../components/AdminLayout';
 
 const InstagramManagement = () => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const InstagramManagement = () => {
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [newReelId, setNewReelId] = useState('');
+ 
 
   useEffect(() => {
     const fetchInstagramConfig = async () => {
@@ -50,22 +51,7 @@ const InstagramManagement = () => {
     }
   };
 
-  const handleAddReelId = () => {
-    if (newReelId.trim()) {
-      setInstagramConfig(prev => ({
-        ...prev,
-        reelIds: [...prev.reelIds, newReelId.trim()]
-      }));
-      setNewReelId('');
-    }
-  };
 
-  const handleRemoveReelId = (index) => {
-    setInstagramConfig(prev => ({
-      ...prev,
-      reelIds: prev.reelIds.filter((_, i) => i !== index)
-    }));
-  };
 
   const handleUsernameChange = (value) => {
     setInstagramConfig(prev => ({
@@ -75,36 +61,25 @@ const InstagramManagement = () => {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Instagram settings...</p>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate('/admin/dashboard')}
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              title="Back to Dashboard"
-            >
-              <FaArrowLeft className="text-gray-600" />
-            </button>
-          </div><div>
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <FaInstagram className="text-pink-600" />
-              Instagram Management
-            </h2>
-          </div>
+    <>
+    <AdminLayout title={"Instgram Management"} >
+        <div className="min-h-screen bg-gray-100">
+      {
+        loading ? (
+            <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading instagram configurations...</p>
         </div>
+        ):(
+          <>
+          
+          
+      <div className='max-w-7xl px-4 py-2'>
+      <div className="bg-white rounded-xl shadow-lg p-6">
+      
 
         {successMessage && (
           <div className="mb-4 bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg">
@@ -153,60 +128,7 @@ const InstagramManagement = () => {
             </p>
           </div>
 
-          {/* Reel IDs */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Instagram Reel IDs
-            </label>
-            <div className="space-y-3">
-              {instagramConfig.reelIds.map((reelId, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    value={reelId}
-                    onChange={(e) => {
-                      const newReelIds = [...instagramConfig.reelIds];
-                      newReelIds[index] = e.target.value;
-                      setInstagramConfig(prev => ({ ...prev, reelIds: newReelIds }));
-                    }}
-                    placeholder="Reel ID (e.g., CxYz123Abc)"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveReelId(index)}
-                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Remove reel"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              ))}
-            </div>
-            
-            {/* Add New Reel ID */}
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={newReelId}
-                onChange={(e) => setNewReelId(e.target.value)}
-                placeholder="Add new reel ID (e.g., CxYz123Abc)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-              />
-              <button
-                type="button"
-                onClick={handleAddReelId}
-                disabled={!newReelId.trim()}
-                className="p-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title="Add reel"
-              >
-                <FaPlus />
-              </button>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">
-              Add Instagram reel IDs to display in the showcase page
-            </p>
-          </div>
+        
 
           {/* Preview */}
           <div className="bg-gray-50 rounded-lg p-4">
@@ -218,21 +140,8 @@ const InstagramManagement = () => {
               <p className="text-sm text-gray-600">
                 <strong>Profile URL:</strong> {instagramConfig.profileUrl}
               </p>
-              <p className="text-sm text-gray-600">
-                <strong>Reels:</strong> {instagramConfig.reelIds.length} reel(s) configured
-              </p>
-              {instagramConfig.reelIds.length > 0 && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-gray-700">Reel IDs:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {instagramConfig.reelIds.map((reelId, index) => (
-                      <span key={index} className="bg-pink-100 text-pink-700 px-2 py-1 rounded text-xs">
-                        {reelId}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+            
+           
             </div>
           </div>
 
@@ -259,6 +168,14 @@ const InstagramManagement = () => {
         </form>
       </div>
     </div>
+          </>
+        )
+      }
+   
+      </div>
+ 
+   </AdminLayout>
+    </>
   );
 };
 
