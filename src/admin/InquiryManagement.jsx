@@ -250,7 +250,7 @@ const InquiryManagement = () => {
               </div>
 
               <div className="mt-6 flex gap-3">
-                <Fragment>
+              <>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(selectedInquiry.email);
@@ -276,7 +276,7 @@ const InquiryManagement = () => {
                 >
                   Close
                 </button>
-              </Fragment>
+              </>
               </div>
             </div>
           </div>
