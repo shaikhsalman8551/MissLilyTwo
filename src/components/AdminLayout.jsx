@@ -55,7 +55,7 @@ const AdminLayout = ({ children, title, loading = false, loadingMessage = 'Loadi
         </div>
         
         {/* Page Content */}
-         <div className="flex-1  px-4 sm:px-2 lg:px-8 py-6 ">
+         <div className="flex-1 overflow-y-auto  px-1 sm:px-11 lg:px-8 py-3 ">
           {loading ? (
             <AdminLoader message={loadingMessage} />
           ) : (

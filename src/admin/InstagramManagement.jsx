@@ -66,7 +66,7 @@ const InstagramManagement = () => {
   return (
     <>
     <AdminLayout title={"Instgram Management"} >
-        <div className="min-h-screen bg-gray-100">
+        <div className=" bg-gray-100">
       {
         loading ? (
             <div className="text-center py-12">
@@ -77,7 +77,7 @@ const InstagramManagement = () => {
           <>
           
           
-      <div className='max-w-7xl px-4 py-2'>
+      <div className='max-w-6xl  py-2'>
       <div className="bg-white rounded-xl shadow-lg p-6">
       
 
